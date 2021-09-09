@@ -1,5 +1,6 @@
 package uns.ac.rs.userservice.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -14,9 +15,12 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "user_t")
@@ -70,9 +74,21 @@ public class User implements UserDetails{
 	@JoinTable(name = "user_authority", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
 	@JsonBackReference(value = "user-authority")
 	private List<Authority> authorities;
-
+	
+	@JsonIgnore
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany(cascade = CascadeType.ALL)
+	private List<User> followers;
+	
+	@JsonIgnore
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany(cascade = CascadeType.ALL)
+	private List<User> following;
+	
 	public User() {
 		super();
+		this.followers = new ArrayList<User>();
+		this.following = new ArrayList<User>();
 	}
 
 	public User(Long id, String username, String password, String email, String firstName, String lastName,
@@ -94,6 +110,8 @@ public class User implements UserDetails{
 		this.canBeTagged = canBeTagged;
 		this.isPrivate = isPrivate;
 		this.authorities = authorities;
+		this.followers = new ArrayList<User>();
+		this.following = new ArrayList<User>();
 	}
 
 	public User(String username, String password, String email, String firstName, String lastName,
@@ -112,6 +130,8 @@ public class User implements UserDetails{
 		this.biography = biography;
 		this.canBeTagged = canBeTagged;
 		this.isPrivate = isPrivate;
+		this.followers = new ArrayList<User>();
+		this.following = new ArrayList<User>();
 	}
 
 	public Long getId() {
@@ -224,6 +244,22 @@ public class User implements UserDetails{
 
 	public void setIsPrivate(Boolean isPrivate) {
 		this.isPrivate = isPrivate;
+	}
+	
+	public List<User> getFollowers() {
+		return followers;
+	}
+
+	public void setFollowers(List<User> followers) {
+		this.followers = followers;
+	}
+
+	public List<User> getFollowing() {
+		return following;
+	}
+
+	public void setFollowing(List<User> following) {
+		this.following = following;
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -84,5 +85,23 @@ public class UserService implements UserDetailsService{
 			return u;
 		else
 			throw new UsernameNotFoundException(String.format("User with username '%s' not found", username));
+	}
+	
+	public List<User> usersThatIFollow(String username) throws UsernameNotFoundException {
+		User user = userRepository.findByUsername(username);
+		if (user != null) {
+			return user.getFollowing();
+		} else {
+			throw new UsernameNotFoundException(String.format("User with username '%s' not found", username));
+		}
+	}
+
+	public User follow(String username) {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		User u = userRepository.findByUsername(user.getUsername());
+		User friend = userRepository.findByUsername(username);
+		u.getFollowing().add(friend);
+		userRepository.save(u);
+		return u;
 	}
 }
