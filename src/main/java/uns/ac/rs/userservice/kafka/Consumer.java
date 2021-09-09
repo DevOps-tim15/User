@@ -1,15 +1,20 @@
 package uns.ac.rs.userservice.kafka;
 
+import java.util.List;
+
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import uns.ac.rs.userservice.domain.User;
 import uns.ac.rs.userservice.kafka.domain.UserMessage;
+import uns.ac.rs.userservice.kafka.domain.UsersMessage;
 import uns.ac.rs.userservice.service.UserService;
 
 @Service
@@ -51,4 +56,12 @@ public class Consumer {
 		}
 
 	}
+	
+	@SendTo
+    @KafkaListener(topics = "following", groupId = "mygroup")
+    public String getFollowers(String username) throws JsonProcessingException {
+		List<User> usersThatIFollow = userService.usersThatIFollow(username);
+		UsersMessage users = new UsersMessage(usersThatIFollow, "following");
+		return objectMapper.writeValueAsString(users);
+    }
 }
