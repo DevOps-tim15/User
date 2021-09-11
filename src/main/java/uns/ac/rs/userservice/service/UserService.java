@@ -105,6 +105,7 @@ public class UserService implements UserDetailsService{
 		authorities.add(a);
 		user.setAuthorities(authorities);
 		user = this.userRepository.save(user);
+		SecurityContextHolder.clearContext();
 		return user;
 	}
 	
