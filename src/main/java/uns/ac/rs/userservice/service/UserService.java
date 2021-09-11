@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import uns.ac.rs.userservice.domain.Authority;
 import uns.ac.rs.userservice.domain.User;
+import uns.ac.rs.userservice.domain.UserType;
 import uns.ac.rs.userservice.repository.AuthorityRepository;
 import uns.ac.rs.userservice.repository.UserRepository;
 import uns.ac.rs.userservice.util.InvalidDataException;
@@ -62,6 +63,51 @@ public class UserService implements UserDetailsService{
 		return user;
 	}
 	
+	public User updateUser(User ru, String oldUsername, UserType role) throws InvalidDataException{
+		
+		User user = findByUsername(oldUsername);
+		User u = findByUsername(ru.getUsername());
+		if(u != null && (!ru.getUsername().equals(user.getUsername()))) {
+			throw new InvalidDataException("Username already taken!"); 
+		}
+		u = findByEmail(ru.getEmail());
+		if(u != null && (!ru.getEmail().equals(user.getEmail()))) {
+			throw new InvalidDataException("Email already taken!"); 
+		}
+		
+		if(Stream.of(ru.getUsername(), ru.getFirstName(), ru.getLastName(), ru.getEmail(), ru.getPassword()).anyMatch(Objects::isNull)) {
+			throw new InvalidDataException("Some data is missing");
+		}
+		
+		if (ru.getUsername().isEmpty() || ru.getFirstName().isEmpty() || ru.getLastName().isEmpty() || ru.getEmail().isEmpty()
+				|| ru.getPassword().isEmpty()) {
+			throw new InvalidDataException("User information is incomplete!");
+		}
+		
+		if (ru.getUsername().isEmpty() || ru.getFirstName().isEmpty() || ru.getLastName().isEmpty() || ru.getEmail().isEmpty()
+				|| ru.getPassword().isEmpty()) {
+			throw new InvalidDataException("User information is incomplete!");
+		}
+
+		user.setUsername(ru.getUsername());
+		user.setFirstName(ru.getLastName());
+		user.setLastName(ru.getLastName());
+		user.setEmail(ru.getEmail());
+		user.setPhone(ru.getPhone());
+		user.setSex(ru.getSex());
+		user.setWebsiteUrl(ru.getWebsiteUrl());
+		user.setBiography(ru.getBiography());
+		user.setBirthDate(ru.getBirthDate());
+		user.setIsPrivate(ru.getIsPrivate());
+		user.setCanBeTagged(ru.getCanBeTagged());
+		Authority a = this.authorityRepository.findAuthorityByUserType(role);
+		List<Authority> authorities = new ArrayList<>();
+		authorities.add(a);
+		user.setAuthorities(authorities);
+		user = this.userRepository.save(user);
+		return user;
+	}
+	
 	public User findByUsername(String username) {
 		return userRepository.findByUsername(username);
 	}
@@ -77,6 +123,7 @@ public class UserService implements UserDetailsService{
 	public Authority findAuthority(Integer id) {
 		return authorityRepository.findById(id).get();
 	}
+
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
