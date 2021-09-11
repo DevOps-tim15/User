@@ -13,9 +13,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import uns.ac.rs.userservice.domain.Authority;
 import uns.ac.rs.userservice.domain.User;
 import uns.ac.rs.userservice.domain.UserType;
+import uns.ac.rs.userservice.kafka.Producer;
+import uns.ac.rs.userservice.kafka.domain.UserMessage;
 import uns.ac.rs.userservice.repository.AuthorityRepository;
 import uns.ac.rs.userservice.repository.UserRepository;
 import uns.ac.rs.userservice.util.InvalidDataException;
@@ -28,6 +32,9 @@ public class UserService implements UserDetailsService{
 	
 	@Autowired
 	private AuthorityRepository authorityRepository;
+	
+	@Autowired
+	private Producer producer;
 	
 	public User saveRegisteredUser(User user) throws InvalidDataException {
 		System.out.println("SAVE USERUSER SERVICE");
@@ -151,5 +158,16 @@ public class UserService implements UserDetailsService{
 		u.getFollowing().add(friend);
 		userRepository.save(u);
 		return u;
+	}
+
+	public Long removeAccount(String username) throws InvalidDataException, JsonProcessingException{
+		User user = userRepository.findByUsername(username);
+		if (user == null) {
+			throw new InvalidDataException("Wrong username.");
+		}
+		userRepository.delete(user);
+		UserMessage message = new UserMessage(user, "remove");
+		producer.sendMessageToTopic("user-topic", message);
+		return user.getId();
 	}
 }
