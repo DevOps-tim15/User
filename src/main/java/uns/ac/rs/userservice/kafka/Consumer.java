@@ -16,6 +16,7 @@ import uns.ac.rs.userservice.domain.User;
 import uns.ac.rs.userservice.kafka.domain.UserMessage;
 import uns.ac.rs.userservice.kafka.domain.UsersMessage;
 import uns.ac.rs.userservice.service.UserService;
+import uns.ac.rs.userservice.util.InvalidDataException;
 
 @Service
 public class Consumer {
@@ -33,7 +34,7 @@ public class Consumer {
 	private KafkaTemplate<String, String> kafkaTemp;
 	
 	@KafkaListener(topics="auth-topic", groupId="mygroup")
-	public void consumeFromTopic(ConsumerRecord<String, String> consumerRecord) throws JsonProcessingException {
+	public void consumeFromTopic(ConsumerRecord<String, String> consumerRecord) throws JsonProcessingException, InvalidDataException {
 		String value = consumerRecord.value();
 		System.out.println("Consummed message " + value);
 		
@@ -53,6 +54,8 @@ public class Consumer {
 				String val = objectMapper.writeValueAsString(um);
 				kafkaTemp.send("user-topic" ,val);
 			}
+		}else if(message.getType().equals("update")) {
+			userService.updateUser(message.getUser(), message.getOldUsername(), message.getRole());
 		}
 
 	}
