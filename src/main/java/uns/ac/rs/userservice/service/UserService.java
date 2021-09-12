@@ -18,8 +18,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import uns.ac.rs.userservice.domain.Authority;
 import uns.ac.rs.userservice.domain.User;
 import uns.ac.rs.userservice.domain.UserType;
+import uns.ac.rs.userservice.dto.UserDTO;
 import uns.ac.rs.userservice.kafka.Producer;
 import uns.ac.rs.userservice.kafka.domain.UserMessage;
+import uns.ac.rs.userservice.kafka.domain.UsersFollowBlockMute;
+import uns.ac.rs.userservice.mapper.UserMapper;
 import uns.ac.rs.userservice.repository.AuthorityRepository;
 import uns.ac.rs.userservice.repository.UserRepository;
 import uns.ac.rs.userservice.util.InvalidDataException;
@@ -71,7 +74,6 @@ public class UserService implements UserDetailsService{
 	}
 	
 	public User updateUser(User ru, String oldUsername, UserType role) throws InvalidDataException{
-		
 		User user = findByUsername(oldUsername);
 		User u = findByUsername(ru.getUsername());
 		if(u != null && (!ru.getUsername().equals(user.getUsername()))) {
@@ -107,10 +109,10 @@ public class UserService implements UserDetailsService{
 		user.setBirthDate(ru.getBirthDate());
 		user.setIsPrivate(ru.getIsPrivate());
 		user.setCanBeTagged(ru.getCanBeTagged());
-		Authority a = this.authorityRepository.findAuthorityByUserType(role);
-		List<Authority> authorities = new ArrayList<>();
-		authorities.add(a);
-		user.setAuthorities(authorities);
+//		Authority a = this.authorityRepository.findAuthorityByUserType(role);
+//		List<Authority> authorities = new ArrayList<>();
+//		authorities.add(a);
+//		user.setAuthorities(authorities);
 		user = this.userRepository.save(user);
 		SecurityContextHolder.clearContext();
 		return user;
@@ -150,6 +152,19 @@ public class UserService implements UserDetailsService{
 			throw new UsernameNotFoundException(String.format("User with username '%s' not found", username));
 		}
 	}
+	
+	public UsersFollowBlockMute usersThatIFollowBlockedAndMuted(String username) throws UsernameNotFoundException {
+		User user = userRepository.findByUsername(username);
+		UsersFollowBlockMute users = new UsersFollowBlockMute();
+		if (user != null) {
+			users.setFollowing(user.getFollowing());
+			users.setBlock(user.getBlockedUsers());
+			users.getBlock().addAll(user.getBlockedByUsers());
+			return users;
+		} else {
+			throw new UsernameNotFoundException(String.format("User with username '%s' not found", username));
+		}
+	}
 
 	public Boolean follow(String username) throws UsernameNotFoundException{
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -179,5 +194,25 @@ public class UserService implements UserDetailsService{
 		UserMessage message = new UserMessage(user, "remove");
 		producer.sendMessageToTopic("user-topic", message);
 		return user.getId();
+	}
+	
+	
+	public UserDTO blockUser(User u, String username) throws InvalidDataException{
+		System.out.println("********************"+ username);
+		User userForBlocking = this.findByUsername(username);
+		if (userForBlocking == null) {
+			throw new InvalidDataException("Invalid user for blocking.");
+		}
+		
+		User userWhoBlocks = this.findByUsername(u.getUsername());
+		if (userWhoBlocks == null) {
+			throw new InvalidDataException("Invalid user that blocks.");
+		}
+		userWhoBlocks.getBlockedUsers().add(userForBlocking);
+		userForBlocking.getBlockedByUsers().add(userWhoBlocks);
+		userRepository.save(userWhoBlocks);
+		userRepository.save(userForBlocking);
+		UserDTO dto = UserMapper.fromEntity(userForBlocking);
+		return dto;
 	}
 }
