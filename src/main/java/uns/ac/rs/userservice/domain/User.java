@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "user_t")
@@ -71,24 +72,37 @@ public class User implements UserDetails{
 	public Boolean isPrivate;
 	
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@JoinTable(name = "user_authority", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
 	@JsonBackReference(value = "user-authority")
 	private List<Authority> authorities;
 	
 	@JsonIgnore
 	@LazyCollection(LazyCollectionOption.FALSE)
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany
 	private List<User> followers;
 	
 	@JsonIgnore
 	@LazyCollection(LazyCollectionOption.FALSE)
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany
 	private List<User> following;
+	
+	@JsonIgnore
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany
+	private List<User> blockedUsers;
+	
+	@JsonIgnore
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany
+	private List<User> blockedByUsers;
 	
 	public User() {
 		super();
 		this.followers = new ArrayList<User>();
 		this.following = new ArrayList<User>();
+		this.blockedUsers = new ArrayList<User>();
+		this.blockedByUsers = new ArrayList<User>();
 	}
 
 	public User(Long id, String username, String password, String email, String firstName, String lastName,
@@ -260,6 +274,23 @@ public class User implements UserDetails{
 
 	public void setFollowing(List<User> following) {
 		this.following = following;
+	}
+	
+	public List<User> getBlockedUsers() {
+		return blockedUsers;
+	}
+
+	public void setBlockedUsers(List<User> blockedUsers) {
+		this.blockedUsers = blockedUsers;
+		
+	}
+
+	public List<User> getBlockedByUsers() {
+		return blockedByUsers;
+	}
+
+	public void setBlockedByUsers(List<User> blockedByUsers) {
+		this.blockedByUsers = blockedByUsers;
 	}
 
 	@Override
