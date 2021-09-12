@@ -151,13 +151,23 @@ public class UserService implements UserDetailsService{
 		}
 	}
 
-	public User follow(String username) {
+	public Boolean follow(String username) throws UsernameNotFoundException{
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User u = userRepository.findByUsername(user.getUsername());
 		User friend = userRepository.findByUsername(username);
-		u.getFollowing().add(friend);
-		userRepository.save(u);
-		return u;
+		if (friend == null) {
+			throw new UsernameNotFoundException(String.format("User with username '%s' not found", username));
+		}
+		if (!friend.getIsPrivate()) {
+			u.getFollowing().add(friend);
+			userRepository.save(u);
+			return true;
+		} else {
+			friend.getFollowingRequests().add(u);
+			userRepository.save(friend);
+			return false;
+		}
+		
 	}
 
 	public Long removeAccount(String username) throws InvalidDataException, JsonProcessingException{
