@@ -50,7 +50,7 @@ public class UserController {
     
 	@PreAuthorize("hasRole('ROLE_REGISTERED_USER') || hasRole('ROLE_AGENT')")
 	@PostMapping(value = "/block/{username}")
-	public ResponseEntity<?> blockUser(String username) {
+	public ResponseEntity<?> blockUser(@PathVariable String username) {
 		try {
 			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			return new ResponseEntity<>(userService.blockUser(user, username), HttpStatus.OK);

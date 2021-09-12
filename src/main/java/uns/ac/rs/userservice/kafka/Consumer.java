@@ -62,7 +62,7 @@ public class Consumer {
 	}
 	
 	@SendTo
-    @KafkaListener(topics = "following", groupId = "mygroup-user")
+    @KafkaListener(topics = "following", groupId = "mygroup")
     public String getFollowers(String username) throws JsonProcessingException {
 		List<User> usersThatIFollow = userService.usersThatIFollow(username);
 		UsersMessage users = new UsersMessage(usersThatIFollow, "following");

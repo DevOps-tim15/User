@@ -18,9 +18,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import uns.ac.rs.userservice.domain.Authority;
 import uns.ac.rs.userservice.domain.User;
 import uns.ac.rs.userservice.domain.UserType;
+import uns.ac.rs.userservice.dto.UserDTO;
 import uns.ac.rs.userservice.kafka.Producer;
 import uns.ac.rs.userservice.kafka.domain.UserMessage;
 import uns.ac.rs.userservice.kafka.domain.UsersFollowBlockMute;
+import uns.ac.rs.userservice.mapper.UserMapper;
 import uns.ac.rs.userservice.repository.AuthorityRepository;
 import uns.ac.rs.userservice.repository.UserRepository;
 import uns.ac.rs.userservice.util.InvalidDataException;
@@ -195,7 +197,8 @@ public class UserService implements UserDetailsService{
 	}
 	
 	
-	public String blockUser(User u, String username) throws InvalidDataException{
+	public UserDTO blockUser(User u, String username) throws InvalidDataException{
+		System.out.println("********************"+ username);
 		User userForBlocking = this.findByUsername(username);
 		if (userForBlocking == null) {
 			throw new InvalidDataException("Invalid user for blocking.");
@@ -209,7 +212,7 @@ public class UserService implements UserDetailsService{
 		userForBlocking.getBlockedByUsers().add(userWhoBlocks);
 		userRepository.save(userWhoBlocks);
 		userRepository.save(userForBlocking);
-		String message = "User " + username+ " successfully blocked!";
-		return message;
+		UserDTO dto = UserMapper.fromEntity(userForBlocking);
+		return dto;
 	}
 }

@@ -98,6 +98,7 @@ public class User implements UserDetails{
 	@ManyToMany
 	private List<User> blockedByUsers;
 	
+	@JsonIgnore
 	@ManyToMany(cascade = CascadeType.ALL)
 	private List<User> followingRequests;
 	
