@@ -26,6 +26,7 @@ public class UserController {
         return new ResponseEntity<>("Hello registered user!", HttpStatus.OK);
     }
     
+	@PreAuthorize("hasRole('ROLE_REGISTERED_USER') || hasRole('ROLE_AGENT')")
     @GetMapping( value = "/follow/{username}")
     public ResponseEntity<?> follow(@PathVariable String username) {
         return new ResponseEntity<>(userService.follow(username), HttpStatus.OK);

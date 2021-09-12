@@ -85,10 +85,16 @@ public class User implements UserDetails{
 	@ManyToMany(cascade = CascadeType.ALL)
 	private List<User> following;
 	
+	@JsonIgnore
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany(cascade = CascadeType.ALL)
+	private List<User> followingRequests;
+	
 	public User() {
 		super();
 		this.followers = new ArrayList<User>();
 		this.following = new ArrayList<User>();
+		this.followingRequests = new ArrayList<User>();
 	}
 
 	public User(Long id, String username, String password, String email, String firstName, String lastName,
@@ -112,6 +118,7 @@ public class User implements UserDetails{
 		this.authorities = authorities;
 		this.followers = new ArrayList<User>();
 		this.following = new ArrayList<User>();
+		this.followingRequests = new ArrayList<User>();
 	}
 
 	public User(String username, String password, String email, String firstName, String lastName,
@@ -132,6 +139,7 @@ public class User implements UserDetails{
 		this.isPrivate = isPrivate;
 		this.followers = new ArrayList<User>();
 		this.following = new ArrayList<User>();
+		this.followingRequests = new ArrayList<User>();
 	}
 
 	public Long getId() {
@@ -260,6 +268,14 @@ public class User implements UserDetails{
 
 	public void setFollowing(List<User> following) {
 		this.following = following;
+	}
+	
+	public List<User> getFollowingRequests() {
+		return followingRequests;
+	}
+
+	public void setFollowingRequests(List<User> followingRequests) {
+		this.followingRequests = followingRequests;
 	}
 
 	@Override
