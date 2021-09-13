@@ -160,6 +160,7 @@ public class UserService implements UserDetailsService{
 			users.setFollowing(user.getFollowing());
 			users.setBlock(user.getBlockedUsers());
 			users.getBlock().addAll(user.getBlockedByUsers());
+			users.setMute(user.getMutedUsers());
 			return users;
 		} else {
 			throw new UsernameNotFoundException(String.format("User with username '%s' not found", username));
@@ -198,7 +199,6 @@ public class UserService implements UserDetailsService{
 	
 	
 	public UserDTO blockUser(User u, String username) throws InvalidDataException{
-		System.out.println("********************"+ username);
 		User userForBlocking = this.findByUsername(username);
 		if (userForBlocking == null) {
 			throw new InvalidDataException("Invalid user for blocking.");
@@ -213,6 +213,38 @@ public class UserService implements UserDetailsService{
 		userRepository.save(userWhoBlocks);
 		userRepository.save(userForBlocking);
 		UserDTO dto = UserMapper.fromEntity(userForBlocking);
+		return dto;
+	}
+	
+	public UserDTO muteUser(User u, String username) throws InvalidDataException{
+		User forMuting = this.findByUsername(username);
+		if (forMuting == null) {
+			throw new InvalidDataException("Invalid user for muting.");
+		}
+		
+		User userWhoMutes = this.findByUsername(u.getUsername());
+		if (userWhoMutes == null) {
+			throw new InvalidDataException("Invalid user that mutes.");
+		}
+		userWhoMutes.getMutedUsers().add(forMuting);
+		userRepository.save(userWhoMutes);
+		UserDTO dto = UserMapper.fromEntity(forMuting);
+		return dto;
+	}
+	
+	public UserDTO unmuteUser(User u, String username) throws InvalidDataException{
+		User forUnmuting = this.findByUsername(username);
+		if (forUnmuting == null) {
+			throw new InvalidDataException("Invalid user for unmuting.");
+		}
+		
+		User userWhoMutes = this.findByUsername(u.getUsername());
+		if (userWhoMutes == null) {
+			throw new InvalidDataException("Invalid user that mutes.");
+		}
+		userWhoMutes.getMutedUsers().remove(forUnmuting);
+		userRepository.save(userWhoMutes);
+		UserDTO dto = UserMapper.fromEntity(forUnmuting);
 		return dto;
 	}
 }
