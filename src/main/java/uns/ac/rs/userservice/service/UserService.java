@@ -279,4 +279,49 @@ public class UserService implements UserDetailsService{
 		UserDTO dto = UserMapper.fromEntity(forUnmuting);
 		return dto;
 	}
+
+	public List<String> getAllRequests(String username) throws InvalidDataException {
+		User user = userRepository.findByUsername(username);
+		if (!user.getIsPrivate()) {
+			throw new InvalidDataException("Public profile can not have following requests.");
+		}
+		List<String> usernames = UserMapper.fromEntityToString(user.getFollowingRequests());
+		return usernames;
+	}
+
+	public List<String> acceptRequest(String username, String follower) throws InvalidDataException {
+		User user = userRepository.findByUsername(username);
+		if (!user.getIsPrivate()) {
+			throw new InvalidDataException("Public profile can not have following requests.");
+		}
+		User followerUser = userRepository.findByUsername(follower);
+		if (followerUser == null) {
+			throw new InvalidDataException("User not found.");
+		}
+		if (!user.getFollowingRequests().contains(followerUser)) {
+			throw new InvalidDataException("Request has not been sent.");
+		}
+		user.getFollowingRequests().remove(followerUser);
+		followerUser.getFollowing().add(user);
+		userRepository.save(user);
+		userRepository.save(followerUser);
+		return UserMapper.fromEntityToString(user.getFollowingRequests());
+	}
+	
+	public List<String> declineRequest(String username, String follower) throws InvalidDataException {
+		User user = userRepository.findByUsername(username);
+		if (!user.getIsPrivate() && !user.getFollowingRequests().isEmpty()) {
+			throw new InvalidDataException("Public profile can not have following requests.");
+		}
+		User followerUser = userRepository.findByUsername(follower);
+		if (followerUser == null) {
+			throw new InvalidDataException("User not found.");
+		}
+		if (!user.getFollowingRequests().contains(followerUser)) {
+			throw new InvalidDataException("Request has not been sent.");
+		}
+		user.getFollowingRequests().remove(followerUser);
+		userRepository.save(user);
+		return UserMapper.fromEntityToString(user.getFollowingRequests());
+	}
 }

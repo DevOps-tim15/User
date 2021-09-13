@@ -113,4 +113,40 @@ public class UserController {
        
     }
 	
+	@PreAuthorize("hasRole('ROLE_REGISTERED_USER') || hasRole('ROLE_AGENT')")
+    @GetMapping( value = "/requests")
+    public ResponseEntity<?> getAllRequests() {
+		try {
+			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return new ResponseEntity<>(userService.getAllRequests(user.getUsername()), HttpStatus.OK);
+		} catch (InvalidDataException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+       
+    }
+	
+	@PreAuthorize("hasRole('ROLE_REGISTERED_USER') || hasRole('ROLE_AGENT')")
+    @GetMapping( value = "/accept/{username}")
+    public ResponseEntity<?> acceptRequest(@PathVariable String username) {
+		try {
+			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return new ResponseEntity<>(userService.acceptRequest(user.getUsername(), username), HttpStatus.OK);
+		} catch (InvalidDataException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+       
+    }
+	
+	@PreAuthorize("hasRole('ROLE_REGISTERED_USER') || hasRole('ROLE_AGENT')")
+    @GetMapping( value = "/decline/{username}")
+    public ResponseEntity<?> declineRequest(@PathVariable String username) {
+		try {
+			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return new ResponseEntity<>(userService.declineRequest(user.getUsername(), username), HttpStatus.OK);
+		} catch (InvalidDataException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+       
+    }
+	
 }
