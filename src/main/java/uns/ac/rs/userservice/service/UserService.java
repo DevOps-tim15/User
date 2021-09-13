@@ -240,6 +240,11 @@ public class UserService implements UserDetailsService{
 		if (userWhoBlocks == null) {
 			throw new InvalidDataException("Invalid user that blocks.");
 		}
+		
+		if (userForBlocking.getIsPrivate() && !userWhoBlocks.getFollowing().contains(userForBlocking)) {
+			throw new InvalidDataException("Can't block private user that you are not following!");
+		}
+		
 		userWhoBlocks.getBlockedUsers().add(userForBlocking);
 		userForBlocking.getBlockedByUsers().add(userWhoBlocks);
 		userRepository.save(userWhoBlocks);
@@ -258,6 +263,11 @@ public class UserService implements UserDetailsService{
 		if (userWhoMutes == null) {
 			throw new InvalidDataException("Invalid user that mutes.");
 		}
+		
+		if (forMuting.getIsPrivate() && !userWhoMutes.getFollowing().contains(forMuting)) {
+			throw new InvalidDataException("Can't mute private user that you are not following!");
+		}
+		
 		userWhoMutes.getMutedUsers().add(forMuting);
 		userRepository.save(userWhoMutes);
 		UserDTO dto = UserMapper.fromEntity(forMuting);
@@ -270,12 +280,18 @@ public class UserService implements UserDetailsService{
 			throw new InvalidDataException("Invalid user for unmuting.");
 		}
 		
-		User userWhoMutes = this.findByUsername(u.getUsername());
-		if (userWhoMutes == null) {
+		User userWhoUnmutes = this.findByUsername(u.getUsername());
+		if (userWhoUnmutes == null) {
 			throw new InvalidDataException("Invalid user that mutes.");
 		}
-		userWhoMutes.getMutedUsers().remove(forUnmuting);
-		userRepository.save(userWhoMutes);
+		
+		if (!userWhoUnmutes.getMutedUsers().contains(forUnmuting)) {
+			throw new InvalidDataException("User not muted.");
+		}
+		
+		
+		userWhoUnmutes.getMutedUsers().remove(forUnmuting);
+		userRepository.save(userWhoUnmutes);
 		UserDTO dto = UserMapper.fromEntity(forUnmuting);
 		return dto;
 	}
