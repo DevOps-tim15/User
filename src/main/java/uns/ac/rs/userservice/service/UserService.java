@@ -153,6 +153,15 @@ public class UserService implements UserDetailsService{
 		}
 	}
 	
+	public List<User> getRequested(String username) throws UsernameNotFoundException {
+		User user = userRepository.findByUsername(username);
+		if (user != null) {
+			return user.getFollowingRequests();
+		} else {
+			throw new UsernameNotFoundException(String.format("User with username '%s' not found", username));
+		}
+	}
+	
 	public UsersFollowBlockMute usersThatIFollowBlockedAndMuted(String username) throws UsernameNotFoundException {
 		User user = userRepository.findByUsername(username);
 		UsersFollowBlockMute users = new UsersFollowBlockMute();
@@ -167,9 +176,8 @@ public class UserService implements UserDetailsService{
 		}
 	}
 
-	public Boolean follow(String username) throws UsernameNotFoundException{
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		User u = userRepository.findByUsername(user.getUsername());
+	public Boolean follow(String username, String followerUsername) throws UsernameNotFoundException{
+		User u = userRepository.findByUsername(followerUsername);
 		User friend = userRepository.findByUsername(username);
 		if (friend == null) {
 			throw new UsernameNotFoundException(String.format("User with username '%s' not found", username));
@@ -184,6 +192,30 @@ public class UserService implements UserDetailsService{
 			return false;
 		}
 		
+	}
+	
+	public Boolean unfollow(String username, String followerUsername) throws UsernameNotFoundException{
+		User u = userRepository.findByUsername(followerUsername);
+		User friend = userRepository.findByUsername(username);
+		if (friend == null) {
+			throw new UsernameNotFoundException(String.format("User with username '%s' not found", username));
+		}
+		
+		u.getFollowing().remove(friend);
+		userRepository.save(u);
+		return true;
+	}
+	
+	public Boolean removeRequest(String username, String followerUsername) throws UsernameNotFoundException{
+		User u = userRepository.findByUsername(followerUsername);
+		User friend = userRepository.findByUsername(username);
+		if (friend == null) {
+			throw new UsernameNotFoundException(String.format("User with username '%s' not found", username));
+		}
+		
+		friend.getFollowingRequests().remove(u);
+		userRepository.save(friend);
+		return true;
 	}
 
 	public Long removeAccount(String username) throws InvalidDataException, JsonProcessingException{
