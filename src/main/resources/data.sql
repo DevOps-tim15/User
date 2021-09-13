@@ -68,5 +68,5 @@ VALUES ('Jova', 'Jovic', 'jova.jovic@gmail.com', 'jova', '$2a$12$ix4Ep6eG2ajt5yj
 INSERT INTO user_authority (user_id, authority_id) VALUES (1, 1), (2,1);
 
 INSERT INTO verification_tokens (`token`, `user_id`) VALUES ('joca-token', 1), ('marko-token',2);
-INSERT INTO `user_t_following` (`user_id`,`following_id`) VALUES ('1', '2');
---INSERT INTO `user_t_following_requests` (`post_id`,`user_id`) VALUES ('2', '1');
+--INSERT INTO `user_t_following` (`user_id`,`following_id`) VALUES ('1', '2');
+INSERT INTO `user_t_following_requests` (`user_id`,`following_requests_id`) VALUES ('2', '1');
