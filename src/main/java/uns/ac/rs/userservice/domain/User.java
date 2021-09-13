@@ -99,6 +99,11 @@ public class User implements UserDetails{
 	private List<User> blockedByUsers;
 	
 	@JsonIgnore
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany
+	private List<User> mutedUsers;
+	
+	@JsonIgnore
 	@ManyToMany(cascade = CascadeType.ALL)
 	private List<User> followingRequests;
 	
@@ -113,7 +118,7 @@ public class User implements UserDetails{
 
 	public User(Long id, String username, String password, String email, String firstName, String lastName,
 			String phone, boolean verified, String websiteUrl, String sex, String birthDate, String biography, Boolean canBeTagged,
-			Boolean isPrivate, List<Authority> authorities) {
+			Boolean isPrivate, List<Authority> authorities, List<User> mutedUsers) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -133,7 +138,8 @@ public class User implements UserDetails{
 		this.followers = new ArrayList<User>();
 		this.following = new ArrayList<User>();
 		this.followingRequests = new ArrayList<User>();
-	}
+		this.mutedUsers = new ArrayList<User>();
+		}
 
 	public User(String username, String password, String email, String firstName, String lastName,
 			String phone, String websiteUrl, String sex, String birthDate, String biography, Boolean canBeTagged,
@@ -307,6 +313,14 @@ public class User implements UserDetails{
 
 	public void setFollowingRequests(List<User> followingRequests) {
 		this.followingRequests = followingRequests;
+	}
+
+	public List<User> getMutedUsers() {
+		return mutedUsers;
+	}
+
+	public void setMutedUsers(List<User> mutedUsers) {
+		this.mutedUsers = mutedUsers;
 	}
 
 	@Override

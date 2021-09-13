@@ -59,4 +59,27 @@ public class UserController {
 		}
 	}
 	
+	@PreAuthorize("hasRole('ROLE_REGISTERED_USER') || hasRole('ROLE_AGENT')")
+	@PostMapping(value = "/mute/{username}")
+	public ResponseEntity<?> muteUser(@PathVariable String username) {
+		try {
+			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return new ResponseEntity<>(userService.muteUser(user, username), HttpStatus.OK);
+		} catch (InvalidDataException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	
+	@PreAuthorize("hasRole('ROLE_REGISTERED_USER') || hasRole('ROLE_AGENT')")
+	@PostMapping(value = "/unmute/{username}")
+	public ResponseEntity<?> unmuteUser(@PathVariable String username) {
+		try {
+			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return new ResponseEntity<>(userService.unmuteUser(user, username), HttpStatus.OK);
+		} catch (InvalidDataException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 }
