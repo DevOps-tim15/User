@@ -63,7 +63,9 @@ INSERT INTO `authorities` (`user_type`) VALUES ('ROLE_ADMIN');
 
 INSERT INTO `user_t` (`first_name`, `last_name`, `email`, `username`, `password`, `phone`, `website_url`, `sex`, `birth_date`, `biography`, `verified`, `can_be_tagged`, `is_private`) 
 VALUES ('Jova', 'Jovic', 'jova.jovic@gmail.com', 'jova', '$2a$12$ix4Ep6eG2ajt5yjWpAlRHusH1srR8GXdh0FvrgRWnVv2hZVRWEhoC', '0601234567', 'somesite.com', 'male', '01.01.01.', 'bio', 1, 1, 0),
-('Marko', 'Maric', 'marko@gmail.com', 'marko', '$2a$12$ix4Ep6eG2ajt5yjWpAlRHusH1srR8GXdh0FvrgRWnVv2hZVRWEhoC', '0601234567', 'somesite.com', 'male', '01.01.01.', 'bio', 1, 1, 1);
+('Marko', 'Maric', 'marko@gmail.com', 'marko', '$2a$12$ix4Ep6eG2ajt5yjWpAlRHusH1srR8GXdh0FvrgRWnVv2hZVRWEhoC', '0601234567', 'somesite.com', 'male', '01.01.01.', 'bio', 1, 1, 1),
+('Mika', 'Mikic', 'mika@gmail.com', 'mika', '$2a$12$ix4Ep6eG2ajt5yjWpAlRHusH1srR8GXdh0FvrgRWnVv2hZVRWEhoC', '0601234567', 'somesite.com', 'male', '01.01.01.', 'bio', 1, 1, 0),
+('Mara', 'Maric', 'mara@gmail.com', 'mara', '$2a$12$ix4Ep6eG2ajt5yjWpAlRHusH1srR8GXdh0FvrgRWnVv2hZVRWEhoC', '0601234567', 'somesite.com', 'male', '01.01.01.', 'bio', 1, 1, 0);
 
 INSERT INTO user_authority (user_id, authority_id) VALUES (1, 1), (2,1);
 
