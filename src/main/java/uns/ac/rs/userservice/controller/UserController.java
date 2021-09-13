@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +33,25 @@ public class UserController {
 	@PreAuthorize("hasRole('ROLE_REGISTERED_USER') || hasRole('ROLE_AGENT')")
     @GetMapping( value = "/follow/{username}")
     public ResponseEntity<?> follow(@PathVariable String username) {
-        return new ResponseEntity<>(userService.follow(username), HttpStatus.OK);
+		try {
+			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return new ResponseEntity<>(userService.follow(username, user.getUsername()), HttpStatus.OK);
+		} catch (UsernameNotFoundException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+       
+    }
+	
+	@PreAuthorize("hasRole('ROLE_REGISTERED_USER') || hasRole('ROLE_AGENT')")
+    @GetMapping( value = "/unfollow/{username}")
+    public ResponseEntity<?> unfollow(@PathVariable String username) {
+		try {
+			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return new ResponseEntity<>(userService.unfollow(username, user.getUsername()), HttpStatus.OK);
+		} catch (UsernameNotFoundException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+       
     }
     
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -81,5 +100,17 @@ public class UserController {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@PreAuthorize("hasRole('ROLE_REGISTERED_USER') || hasRole('ROLE_AGENT')")
+    @GetMapping( value = "/removeRequest/{username}")
+    public ResponseEntity<?> removeRequest(@PathVariable String username) {
+		try {
+			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return new ResponseEntity<>(userService.removeRequest(username, user.getUsername()), HttpStatus.OK);
+		} catch (UsernameNotFoundException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+       
+    }
 	
 }

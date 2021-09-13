@@ -75,4 +75,12 @@ public class Consumer {
 		UsersFollowBlockMute users = userService.usersThatIFollowBlockedAndMuted(username);
 		return objectMapper.writeValueAsString(users);
     }
+	
+	@SendTo
+    @KafkaListener(topics = "requested", groupId = "mygroup-user")
+    public String getRequested(String username) throws JsonProcessingException {
+		List<User> followingRequests = userService.getRequested(username);
+		UsersMessage users = new UsersMessage(followingRequests, "requested");
+		return objectMapper.writeValueAsString(users);
+    }
 }

@@ -104,7 +104,8 @@ public class User implements UserDetails{
 	private List<User> mutedUsers;
 	
 	@JsonIgnore
-	@ManyToMany(cascade = CascadeType.ALL)
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany
 	private List<User> followingRequests;
 	
 	public User() {
