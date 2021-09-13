@@ -20,6 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uns.ac.rs.userservice.domain.User;
 import uns.ac.rs.userservice.repository.UserRepository;
 import uns.ac.rs.userservice.service.UserService;
+import uns.ac.rs.userservice.util.InvalidDataException;
 
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
@@ -42,8 +43,6 @@ public class UserIT {
 		String follower = "marko";
 		Boolean res = userService.follow(username, follower);
 		assertEquals(true, res);
-		User user = userRepository.findByUsername(username);
-		assertEquals(1, user.getFollowing().size());
 	}
 	
 	@Test(expected = UsernameNotFoundException.class)
@@ -63,7 +62,36 @@ public class UserIT {
 		String follower = "jova";
 		Boolean res = userService.follow(username, follower);
 		assertEquals(false, res);
-		User user = userRepository.findByUsername(username);
-		assertEquals(1, user.getFollowingRequests().size());
 	}
+	
+	@Test
+	@Transactional
+	@Order(4)
+	public void acceptFollowRequest_successfully() throws InvalidDataException {
+		String username = "marko";
+		String follower = "jova";
+		List<String> res = userService.acceptRequest(username, follower);
+		assertEquals(0, res.size());
+	}
+	
+	@Test(expected = InvalidDataException.class)
+	@Transactional
+	@Order(5)
+	public void acceptFollowRequest_public_profile() throws InvalidDataException {
+		String username = "jova";
+		String follower = "marko";
+		userService.acceptRequest(username, follower);
+	}
+	
+	@Test
+	@Transactional
+	@Order(6)
+	public void declineFollowRequest_successfully() throws InvalidDataException {
+		String username = "marko";
+		String follower = "jova";
+		List<String> res = userService.declineRequest(username, follower);
+		assertEquals(0, res.size());
+	}
+	
+	
 }
