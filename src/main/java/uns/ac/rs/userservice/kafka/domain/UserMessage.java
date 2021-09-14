@@ -6,11 +6,8 @@ import uns.ac.rs.userservice.domain.UserType;
 public class UserMessage {
 	
 	private User user;
-	
 	private String oldUsername;
-	
 	private UserType role;
-	
 	private String type;
 
 	
@@ -48,7 +45,6 @@ public class UserMessage {
 	public void setOldUsername(String oldUsername) {
 		this.oldUsername = oldUsername;
 	}
-
 	public User getUser() {
 		return user;
 	}

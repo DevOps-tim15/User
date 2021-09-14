@@ -134,7 +134,6 @@ public class UserService implements UserDetailsService{
 		return authorityRepository.findById(id).get();
 	}
 
-
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		UserDetails u =  userRepository.findByUsername(username);

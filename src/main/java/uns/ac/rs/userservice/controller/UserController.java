@@ -17,7 +17,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import uns.ac.rs.userservice.domain.User;
 import uns.ac.rs.userservice.service.UserService;
 import uns.ac.rs.userservice.util.InvalidDataException;
-
 @RestController
 public class UserController {
 	
@@ -148,5 +147,4 @@ public class UserController {
 		}
        
     }
-	
 }

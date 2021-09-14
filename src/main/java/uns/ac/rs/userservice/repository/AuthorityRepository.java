@@ -7,6 +7,5 @@ import uns.ac.rs.userservice.domain.UserType;
 
 
 public interface AuthorityRepository extends JpaRepository<Authority, Integer> {
-
 	Authority findAuthorityByUserType(UserType userType);
 }
