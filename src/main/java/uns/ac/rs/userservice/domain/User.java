@@ -70,8 +70,7 @@ public class User implements UserDetails{
 	@Column(name = "isPrivate")
 	public Boolean isPrivate;
 	
-	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "user_authority", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
 	@JsonBackReference(value = "user-authority")
 	private List<Authority> authorities;
