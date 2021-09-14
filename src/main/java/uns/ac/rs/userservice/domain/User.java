@@ -71,29 +71,54 @@ public class User implements UserDetails{
 	public Boolean isPrivate;
 	
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@JoinTable(name = "user_authority", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
 	@JsonBackReference(value = "user-authority")
 	private List<Authority> authorities;
 	
 	@JsonIgnore
 	@LazyCollection(LazyCollectionOption.FALSE)
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany
 	private List<User> followers;
 	
 	@JsonIgnore
 	@LazyCollection(LazyCollectionOption.FALSE)
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany
 	private List<User> following;
+	
+	@JsonIgnore
+	@LazyCollection(LazyCollectionOption.FALSE)
+
+	@ManyToMany
+	private List<User> blockedUsers;
+	
+	@JsonIgnore
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany
+	private List<User> blockedByUsers;
+	
+	@JsonIgnore
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany
+	private List<User> mutedUsers;
+	
+	@JsonIgnore
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany
+	private List<User> followingRequests;
 	
 	public User() {
 		super();
 		this.followers = new ArrayList<User>();
 		this.following = new ArrayList<User>();
+		this.blockedUsers = new ArrayList<User>();
+		this.blockedByUsers = new ArrayList<User>();
+		this.followingRequests = new ArrayList<User>();
 	}
 
 	public User(Long id, String username, String password, String email, String firstName, String lastName,
 			String phone, boolean verified, String websiteUrl, String sex, String birthDate, String biography, Boolean canBeTagged,
-			Boolean isPrivate, List<Authority> authorities) {
+			Boolean isPrivate, List<Authority> authorities, List<User> mutedUsers) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -112,7 +137,9 @@ public class User implements UserDetails{
 		this.authorities = authorities;
 		this.followers = new ArrayList<User>();
 		this.following = new ArrayList<User>();
-	}
+		this.followingRequests = new ArrayList<User>();
+		this.mutedUsers = new ArrayList<User>();
+		}
 
 	public User(String username, String password, String email, String firstName, String lastName,
 			String phone, String websiteUrl, String sex, String birthDate, String biography, Boolean canBeTagged,
@@ -132,6 +159,7 @@ public class User implements UserDetails{
 		this.isPrivate = isPrivate;
 		this.followers = new ArrayList<User>();
 		this.following = new ArrayList<User>();
+		this.followingRequests = new ArrayList<User>();
 	}
 
 	public Long getId() {
@@ -260,6 +288,39 @@ public class User implements UserDetails{
 
 	public void setFollowing(List<User> following) {
 		this.following = following;
+	}
+	
+	public List<User> getBlockedUsers() {
+		return blockedUsers;
+	}
+
+	public void setBlockedUsers(List<User> blockedUsers) {
+		this.blockedUsers = blockedUsers;
+		
+	}
+
+	public List<User> getBlockedByUsers() {
+		return blockedByUsers;
+	}
+
+	public void setBlockedByUsers(List<User> blockedByUsers) {
+		this.blockedByUsers = blockedByUsers;
+	}
+	
+	public List<User> getFollowingRequests() {
+		return followingRequests;
+	}
+
+	public void setFollowingRequests(List<User> followingRequests) {
+		this.followingRequests = followingRequests;
+	}
+
+	public List<User> getMutedUsers() {
+		return mutedUsers;
+	}
+
+	public void setMutedUsers(List<User> mutedUsers) {
+		this.mutedUsers = mutedUsers;
 	}
 
 	@Override
